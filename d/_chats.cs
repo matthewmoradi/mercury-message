@@ -52,6 +52,13 @@ namespace mercury.data
         {
             return dbc_mercury.chats.Where(x => x.user_1_id == user_id || x.user_2_id == user_id || _commons.group_users_get_(x.group_id, user_id) != null);
         }
+        public static string get_target_id(string id, string user_id)
+        {
+            var _chat = dbc_mercury.chats.FirstOrDefault(x => x.id == id);
+            if (_chat == null)
+                return null;
+            return _chat.user_1_id == user_id ? _chat.user_2_id : _chat.user_1_id;
+        }
         public static chat get_group(string group_id)
         {
             return dbc_mercury.chats.FirstOrDefault(x => x.group_id == group_id);

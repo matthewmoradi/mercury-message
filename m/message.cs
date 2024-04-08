@@ -65,6 +65,7 @@ namespace mercury.model
     public class message_dto_client
     {
         public string id { get; set; }
+        public string chat_id { get; set; }
         public string user_ { set; get; }
         public string text { get; set; }
         public string text_edited { get; set; }
@@ -79,6 +80,7 @@ namespace mercury.model
         public message_dto_client(message _message, user _user)
         {
             this.id = _message.id;
+            this.chat_id = _message.chat_id;
             this.user_ = _commons.users_get__name_(_message.user_id);
             this.text = _message.text;
             this.text_edited = _message.text_edited;

@@ -17,12 +17,16 @@ namespace mercury.controller
         #region users
         public static user validate_user(HttpRequest req)
         {
+            string user_id = ctrl_tools.header_get(req, "user_id");
+            string user_token = ctrl_tools.header_get(req, "token");
+            return validate_user(user_id, user_token);
+        }
+        public static user validate_user(string user_id, string user_token)
+        {
             try
             {
                 string srv_url = _io._config_value("url_users") + "validate";
                 string srv_token = _io._config_value("token_users");
-                string user_id = ctrl_tools.header_get(req, "user_id");
-                string user_token = ctrl_tools.header_get(req, "token");
                 Dictionary<string, string> data = new() { { "user_id", user_id }, { "user_token", user_token }, { "token", srv_token } };
                 var res = api.post(srv_url, JsonConvert.SerializeObject(data));
                 if (res == null)
@@ -42,7 +46,7 @@ namespace mercury.controller
             }
         }
         #endregion users
-        
+
         #region messages
         public static dto.msg push_message(string path, message item = null)
         {

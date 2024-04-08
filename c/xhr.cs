@@ -124,6 +124,16 @@ namespace mercury.controller
             message _message = _messages.add(_user, parameters["chat_id"], parameters["text"], parameters["reply_id"], parameters["attachment"], int.Parse(parameters["type"]), ref str);
             if (_message == null)
                 return ctrl_tools.ret(this, dto.msg.fail_(str));
+            // 
+            var target_id = _chats.get_target_id(_message.chat_id, _user.id);
+            if (string.IsNullOrEmpty(target_id))
+            {
+                _sys.log(new Exception("WTF, how can chat target be empty"));
+                return ctrl_tools.ret(this, dto.msg.error_500());
+            }
+            var target = ws_handle.USER_(target_id);
+            var msg = new dto.msg_ws("message", JsonConvert.SerializeObject(new message_dto_client(_message, target)), true);
+            ws.send(target, dto.msg.success_data(JsonConvert.SerializeObject(msg)));
             return ctrl_tools.ret(this, dto.msg.success_());
         }
         public ActionResult message_files(user _user, Dictionary<string, string> parameters)

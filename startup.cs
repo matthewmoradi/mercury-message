@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using mercury.controller;
 
 namespace mercury
 {
@@ -68,6 +69,12 @@ namespace mercury
                 endpoints.MapControllerRoute(name: "default", pattern: "{controller=def}/{action=content}/{id?}/{title?}");
                 //endpoints.MapControllerRoute(name: "content", pattern: "doc/{action=content}/{id?}/{title?}");
             });
+            var webSocketOptions = new WebSocketOptions()
+            {
+                KeepAliveInterval = TimeSpan.FromSeconds(10),
+            };
+            app.UseWebSockets(webSocketOptions);
+            app.UseMiddleware<ws>();
         }
     }
 }
