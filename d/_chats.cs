@@ -180,6 +180,13 @@ namespace mercury.data
             dbc_mercury.chats.Add(item);
             return item;
         }
+        public static void set_read(string user_id, string id)
+        {
+            var item = get_(id);
+            if(item == null)
+                return;
+            _messages.set_read(user_id, id);
+        }
         #endregion
         #region delete
         public static bool delete(user _user, string id, ref string str)

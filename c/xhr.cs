@@ -39,8 +39,10 @@ namespace mercury.controller
                 // chat
                 case "chat_get_or_add":
                     return chat_get_or_add(_user, parameters);
-                case "chat_get":
-                    return chat_get(_user, parameters);
+                case "chat_get_list":
+                    return chat_get_list(_user, parameters);
+                case "chat_set_read":
+                    return chat_set_read(_user, parameters);
                 case "chat_clear":
                     return chat_clear(_user, parameters);
                 case "chat_delete":
@@ -83,10 +85,17 @@ namespace mercury.controller
             var res = new chat_dto_client_user(item, _user);
             return ctrl_tools.ret(this, dto.msg.success_data(JsonConvert.SerializeObject(res)));
         }
-        public ActionResult chat_get(user _user, Dictionary<string, string> parameters)
+        public ActionResult chat_set_read(user _user, Dictionary<string, string> parameters)
+        {
+            if (!ctrl_tools.contains(parameters, new string[] { "id" }))
+                return ctrl_tools.ret(this, dto.msg.error_500());
+            _chats.set_read(_user.id, parameters["id"]);
+            return ctrl_tools.ret(this, dto.msg.success_());
+        }
+        public ActionResult chat_get_list(user _user, Dictionary<string, string> parameters)
         {
             var query = _chats.get_user(_user.id);
-            var res = query.Select(x => new chat_dto_client_chat(x, _user)).ToList();
+            var res = query.Select(x => new chat_dto_client_chat(x, _user)).OrderByDescending(x => x.last_date).ToList();
             return ctrl_tools.ret(this, dto.msg.success_data(JsonConvert.SerializeObject(res)));
         }
         public ActionResult chat_clear(user _user, Dictionary<string, string> parameters)
@@ -120,7 +129,7 @@ namespace mercury.controller
             //check attachment, must be base64
             //add message
             string str = "";
-            System.Console.WriteLine(parameters["text"]);
+            // System.Console.WriteLine(parameters["text"]);
             message _message = _messages.add(_user, parameters["chat_id"], parameters["text"], parameters["reply_id"], parameters["attachment"], int.Parse(parameters["type"]), ref str);
             if (_message == null)
                 return ctrl_tools.ret(this, dto.msg.fail_(str));
@@ -132,6 +141,13 @@ namespace mercury.controller
                 return ctrl_tools.ret(this, dto.msg.error_500());
             }
             var target = ws_handle.USER_(target_id);
+            if(target == null)
+            {
+                //target is not in app, send notif
+                System.Console.WriteLine("target is offline!");
+                return ctrl_tools.ret(this, dto.msg.success_());
+            }
+            System.Console.WriteLine($"Sending {target.username} ws message {_message.text} to notify about a new message!");
             var msg = new dto.msg_ws("message", JsonConvert.SerializeObject(new message_dto_client(_message, target)), true);
             ws.send(target, dto.msg.success_data(JsonConvert.SerializeObject(msg)));
             return ctrl_tools.ret(this, dto.msg.success_());

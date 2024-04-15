@@ -56,6 +56,7 @@ namespace mercury.controller
             if (item != null)
             {
                 string item_str = JsonConvert.SerializeObject(item);
+                // System.Console.WriteLine(item_str);
                 data.Add("message", item_str);
             }
             var res = api.post(url, JsonConvert.SerializeObject(data));

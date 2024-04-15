@@ -73,6 +73,10 @@ namespace mercury.data
         {
             return dbc_mercury.messages.Where(x => x.chat_id == chat_id);
         }
+        public static IEnumerable<message> get_chat_unread(string user_id, string chat_id)
+        {
+            return dbc_mercury.messages.Where(x => x.chat_id == chat_id && !x.read && x.user_id != user_id);
+        }
         public static IEnumerable<message> get_chat(string chat_id, int type)
         {
             return dbc_mercury.messages.Where(x => x.chat_id == chat_id && x.type == type);
@@ -134,6 +138,7 @@ namespace mercury.data
             item.reply_id = reply_id;
             // item.attachment_id = _attachment.id;
             item.type = type;
+            item.read = false;
             item.dt_update = item.dt_sent = stringify.dttol(DateTime.Now);
             ctrl_db.insert_message(item);
             dbc_mercury.messages.Add(item);
@@ -150,6 +155,7 @@ namespace mercury.data
             item.reply_id = null;
             item.attachment_id = _message_.attachment_id;
             item.type = _message_.type;
+            item.read = false;
             item.dt_update = item.dt_sent = stringify.dttol(DateTime.Now);
             ctrl_db.insert_message(item);
             dbc_mercury.messages.Add(item);
@@ -177,6 +183,17 @@ namespace mercury.data
             item.dt_update = stringify.dttol(DateTime.Now);
             ctrl_db.update_message(item);
             return true;
+        }
+        public static void set_read(string user_id, string chat_id)
+        {
+            var items = get_chat_unread(user_id, chat_id);
+            if (!items.Any())
+                return;
+            foreach (var item in items)
+            {
+                item.read = true;
+                ctrl_db.update_message(item);
+            }
         }
         public static bool forward(user _user, string id, string[] chat_ids, ref string str)
         {

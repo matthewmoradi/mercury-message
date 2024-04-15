@@ -46,15 +46,15 @@ namespace mercury.model
         
         public chat_dto_client_user(chat _chat, user _user)
         {
-            System.Console.WriteLine(_chat.user_1_id);
-            System.Console.WriteLine(_chat.user_2_id);
+            // System.Console.WriteLine(_chat.user_1_id);
+            // System.Console.WriteLine(_chat.user_2_id);
             string _user_target_id = _chat.user_1_id == _user.id ? _chat.user_2_id : _chat.user_1_id;
             // 
             this.id = _chat.id;
             this.title = _chats.get__title_(_chat.id, _user_target_id);
             this.last_seen = _commons.users_get__last_seen_(_user_target_id);
             this.username = _commons.users_get_(_user_target_id).username;
-            this.messages = _messages.get_chat(this.id).Select(x => new message_dto_client(x, _user)).ToList();
+            this.messages = _messages.get_chat(this.id).OrderBy(x => x.dt_sent).Select(x => new message_dto_client(x, _user)).ToList();
         }
     }
     public class chat_dto_client_chat
@@ -64,6 +64,8 @@ namespace mercury.model
         public string avatar { get; set; }
         public string message { get; set; }
         public string username { get; set; }
+        public int unread { get; set; } = 0;
+        public string last_date { get; set; }
         public string dt { get; set; }
         public List<message_dto_client> messages { get; set; }
         
@@ -81,7 +83,9 @@ namespace mercury.model
             if(message == null)
                 return;
             this.message = message.text;
+            this.unread = _messages.get_chat_unread(_user.id, _chat.id).Count();
             DateTime dt = stringify.ltodt(message.dt_sent);
+            this.last_date = dt.ToString(entity.dt_format);
             if(dt.Date == DateTime.Now.Date)
                 this.dt = dt.ToString(entity.time_format);
             else if(dt.Date == DateTime.Now.AddDays(-6).Date)

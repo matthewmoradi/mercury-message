@@ -20,6 +20,7 @@ namespace mercury.model
         public user_min(user _user, string socket_id)
         {
             this.id = _user.id;
+            this.username = _user.username;
             this.name = _user.get_name();
             this.dt_register = stringify.ltodt(_user.dt_register).ToString(entity.dt_format);
             this.dt_last_login = stringify.ltodt(_user.dt_last_login).ToString(entity.dt_format);
