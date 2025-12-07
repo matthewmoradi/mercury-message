@@ -1,0 +1,11 @@
+sudo dotnet publish -c Release -r  linux-musl-x64 /p:PublishSingleFile=true /p:PublishTrimmed=true /p:PublishReadyToRun=true
+dotnet publish -c Release -r win-x64 /p:PublishSingleFile=true /p:PublishTrimmed=true /p:PublishReadyToRun=true
+dotnet publish -c Release -r win-x64  --> main
+dotnet publish -c Release -r win-x86
+dotnet publish -c Release -r linux-x64
+dotnet publish -c Release -r ubuntu.16.10-x64
+dotnet publish -c Release -r win-x64 /p:PublishTrimmed=true
+
+remove 2 from congfig in windows host
+
+SELECT * FROM `wp_users` as u left OUTER JOIN wp_usermeta as um on u.ID = um.user_id and (um.meta_key = 'first_name' or um.meta_key = 'last_name' or um.meta_key = 'phone_number')
